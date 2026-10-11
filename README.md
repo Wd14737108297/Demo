@@ -1,9 +1,22 @@
-# Improved Faster R-CNN for Solar Panel Defect Detection
+# 改进 Faster R-CNN 在太阳能电池板缺陷检测中的应用与性能优化
 
-PyTorch 实现 | 论文处于投刊阶段，标题：《Improved Faster R-CNN for Solar Panel Defect Detection》
+PyTorch 实现 | 论文处于投刊阶段，标题：《改进 Faster R-CNN 在太阳能电池板缺陷检测中的应用与性能优化》
 
 提出融合 **CBAM 卷积块注意力机制** 与 **Focal Loss** 的改进 Faster R-CNN，实现太阳能电池板常见缺陷与健康面板的高精度检测，辅助光伏组件自动化质检。
 
+- GitHub 仓库：https://github.com/Wd14737108297/Improved-Faster-R-CNN-for-Solar-Panel-Defect-Detection
+
+---
+
+## 📦 资源下载
+
+| 资源 | 下载方式 | 放置位置 |
+|---|---|---|
+| 数据集 | 百度网盘：[链接](https://pan.baidu.com/s/1Ok_INdRfG9HW6rtlcxHlAA?pwd=nqf3) 提取码：nqf3 | 解压后得到 `VOCdevkit/`，放项目根目录 |
+| 预训练权重 + 训练权重 | 百度网盘：[链接](https://pan.baidu.com/s/1Hwcfb7of3KqYPwfUqsZSuA?pwd=y598) 提取码：y598 | 按压缩包内 `使用说明.txt` 放置 |
+| 公开数据集 ELPV | https://gitcode.com/gh_mirrors/el/elpv-dataset | 按需下载 |
+
+> 若网盘链接失效，请在本仓库提交 Issue 或联系邮箱 wudile@huuc.edu.cn 获取最新链接。
 
 ---
 
@@ -68,40 +81,44 @@ Dirty
 
 > 说明：论文中同时提到隐裂、断栅、热斑、污损等缺陷类型；本仓库实际检测类别为 Broken、Clean、Dirty 三类。若需扩展其他缺陷类别，请补充数据集并修改 `model_data/cls_classes.txt`。
 
+**数据集下载：**
+
+由于数据集体积较大，未直接上传至 GitHub，请通过百度网盘下载：
+
+- **压缩包名称**：`VOC07+12+test.zip`
+- **百度网盘链接**：https://pan.baidu.com/s/1Ok_INdRfG9HW6rtlcxHlAA?pwd=nqf3
+- **提取码**：nqf3
+
+**放置方式：**
+
+下载后解压，将得到的 `VOCdevkit` 文件夹放在项目根目录下，最终目录结构如下：
+
+```text
+项目根目录/
+├── VOCdevkit/
+│   └── VOC2007/
+│       ├── Annotations/
+│       ├── JPEGImages/
+│       └── ImageSets/
+│           └── Main/
+│               ├── train.txt
+│               ├── val.txt
+│               ├── trainval.txt
+│               └── test.txt
+├── model_data/
+├── nets/
+├── utils/
+├── train.py
+└── ...
+```
+
+> 如果下载的数据集已经包含划分好的 `train.txt`、`val.txt`、`trainval.txt`、`test.txt`，可直接使用；否则请运行 `python voc_annotation.py` 重新生成。
+
 ### 3.2 公开数据集 ELPV
 
 为进一步提升模型泛化能力，本研究额外引入 ELPV Dataset 进行训练与评估，包含 2624 张单晶与多晶标注图像：
 
 https://gitcode.com/gh_mirrors/el/elpv-dataset
-
-### 3.3 数据集结构
-
-项目使用 VOC 格式数据集，目录结构如下：
-
-```text
-VOCdevkit/
-└── VOC2007/
-    ├── Annotations/
-    │   ├── 000001.xml
-    │   └── ...
-    ├── JPEGImages/
-    │   ├── 000001.jpg
-    │   └── ...
-    └── ImageSets/
-        └── Main/
-            ├── train.txt
-            ├── val.txt
-            ├── trainval.txt
-            └── test.txt
-```
-
-类别文件：
-
-```text
-model_data/cls_classes.txt
-```
-
-> 数据集和预训练权重正在整理中，即将随仓库或通过网盘公开上传。上传后会在本 README 中更新下载链接，请关注后续更新。
 
 ---
 
@@ -310,18 +327,36 @@ python summary.py
 
 ### 6.7 预训练权重
 
-预训练权重正在整理中，即将上传。上传后会在本 README 中更新下载链接。
+由于 GitHub 文件大小限制，预训练权重与训练好的模型权重已上传至百度网盘，请下载后按说明放置。
 
-当前可先使用主干预训练权重进行训练：
+**权重压缩包下载：**
 
-```text
-model_data/voc_weights_resnet.pth
+- **压缩包名称**：`fasterrcnn_solar_panel_weights.zip`
+- **百度网盘链接**：https://pan.baidu.com/s/1Hwcfb7of3KqYPwfUqsZSuA?pwd=y598
+- **提取码**：y598
+
+**压缩包内文件及放置位置：**
+
+| 文件 | 放置目录 | 用途 |
+|---|---|---|
+| `voc_weights_resnet.pth` | `model_data/` | 训练预训练权重，用于加载整个 Faster R-CNN 模型参数 |
+| `resnet50-19c8e357.pth` | `model_data/` | ResNet-50 主干 ImageNet 预训练权重（备用） |
+| `best_epoch_weights.pth` | `logs/` | 训练好的最优模型权重，用于预测和 mAP 评估 |
+
+> 压缩包内附有 `使用说明.txt`，可对照放置。若不想下载 `resnet50-19c8e357.pth`，代码也会自动从 PyTorch 官网下载，但国内网络可能较慢，建议直接使用压缩包内的文件。
+
+**快速验证：**
+
+放置完成后，运行单张图片预测：
+
+```bash
+python predict.py
 ```
 
-训练完成后，最佳权重默认保存为：
+评估 mAP：
 
-```text
-logs/best_epoch_weights.pth
+```bash
+python get_map.py
 ```
 
 ---
@@ -395,7 +430,7 @@ logs/best_epoch_weights.pth
    训练过程中的 mAP 曲线用于观察趋势，最终论文指标建议以 `get_map.py` 的输出为准。
 
 8. **数据集适配**  
-   当前模型与权重仅针对 `model_data/cls_classes.txt` 中的类别。若新增缺陷类别，需补充对应数据集并重新训练。
+   当前模型与权重仅针对 `model_data/cls_classes.txt` 中的类别。若新增缺陷类别，需补充对应数据集并重新训练。数据集请从百度网盘下载，解压后放在项目根目录。
 
 9. **图像分辨率**  
    输入图像会自动 resize 至 600×600 左右，若原始图像分辨率过低，可能导致早期微小缺陷特征丢失，建议输入图像分辨率 ≥ 600×600。
@@ -413,7 +448,7 @@ logs/best_epoch_weights.pth
 
 ```bibtex
 @article{wu2026fasterrcnn,
-  title={Improved Faster R-CNN for Solar Panel Defect Detection},
+  title={改进 Faster R-CNN 在太阳能电池板缺陷检测中的应用与性能优化},
   author={[作者姓名，待发表时补充]},
   journal={[期刊名称，待录用后补充]},
   year={2026},
@@ -426,3 +461,4 @@ logs/best_epoch_weights.pth
 - 邮箱：wudile@huuc.edu.cn
 - GitHub Issue：直接在本仓库提交 Issue，会在 1-3 个工作日内回复。
 
+---
